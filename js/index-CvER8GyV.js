@@ -32011,18 +32011,7 @@ const C3 = "./assets/videos/intro-video-new-XmwQeafK.mp4",
     };
 
 function T3() {
-    const {
-        language: e,
-        setLanguage: t
-    } = At();
-    return h.jsx("div", {
-        className: "fixed top-4 right-4 z-50 flex gap-1 bg-white/90 backdrop-blur-sm border border-sage/30 shadow-md rounded-full p-1",
-        children: Object.keys(Lw).map(n => h.jsx("button", {
-            onClick: () => t(n),
-            className: `px-3 py-1.5 rounded-full text-sm font-body font-medium transition-colors ${e===n?"bg-sage-dark text-white":"text-sage-dark hover:bg-sage/10"}`,
-            children: Lw[n]
-        }, n))
-    })
+    return null
 }
 const P3 = "./assets/images/floral-vase-6x28LN74.png",
     R3 = "./assets/images/cupid-illustration-BO3_EWaD.png",
