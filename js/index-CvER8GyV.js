@@ -31770,13 +31770,6 @@ function E3() {
                                     onChange: C => x(_, C.target.value),
                                     className: "bg-ivory border-[#c5a46d]/30 text-sage-dark placeholder:text-sage-dark/50 focus:border-[#c5a46d]",
                                     placeholder: e("rsvp.name")
-                                }), _ === 0 && h.jsx(Fr, {
-                                    type: "email",
-                                    required: !0,
-                                    value: E.email,
-                                    onChange: C => v(_, C.target.value),
-                                    className: "bg-ivory border-[#c5a46d]/30 text-sage-dark placeholder:text-sage-dark/50 focus:border-[#c5a46d]",
-                                    placeholder: e("rsvp.email")
                                 }), h.jsxs("div", {
                                     className: "space-y-2",
                                     children: [h.jsx(ht, {
@@ -31792,69 +31785,6 @@ function E3() {
                                     })]
                                 })]
                             }, _))
-                        })]
-                    }), d.attendance === "yes" && h.jsxs("div", {
-                        className: "space-y-4",
-                        children: [h.jsx(ht, {
-                            className: "text-sage-dark font-medium text-base",
-                            children: e("rsvp.childrenQuestion")
-                        }), h.jsxs(fp, {
-                            value: i,
-                            onValueChange: E => {
-                                o(E), E === "no" && l(0), E === "yes" && a === 0 && l(1)
-                            },
-                            className: "flex flex-col gap-3",
-                            children: [h.jsxs("div", {
-                                className: "flex items-center space-x-2",
-                                children: [h.jsx(ra, {
-                                    value: "yes",
-                                    id: "children-yes",
-                                    className: "border-[#c5a46d] text-[#c5a46d]"
-                                }), h.jsx(ht, {
-                                    htmlFor: "children-yes",
-                                    className: "cursor-pointer text-sage-dark",
-                                    children: e("rsvp.childrenYes")
-                                })]
-                            }), h.jsxs("div", {
-                                className: "flex items-center space-x-2",
-                                children: [h.jsx(ra, {
-                                    value: "no",
-                                    id: "children-no",
-                                    className: "border-[#c5a46d] text-[#c5a46d]"
-                                }), h.jsx(ht, {
-                                    htmlFor: "children-no",
-                                    className: "cursor-pointer text-sage-dark",
-                                    children: e("rsvp.childrenNo")
-                                })]
-                            })]
-                        }), i === "yes" && h.jsxs("div", {
-                            className: "space-y-2",
-                            children: [h.jsx(ht, {
-                                className: "text-sm text-sage-dark/80",
-                                children: e("rsvp.childrenCount")
-                            }), h.jsxs("div", {
-                                className: "flex items-center gap-2",
-                                children: [h.jsx(It, {
-                                    type: "button",
-                                    variant: "outline",
-                                    size: "icon",
-                                    className: "h-10 w-10 border-[#c5a46d]/30 text-sage-dark hover:bg-[#c5a46d]/10",
-                                    onClick: () => l(Math.max(1, a - 1)),
-                                    disabled: a <= 1,
-                                    children: "-"
-                                }), h.jsx("span", {
-                                    className: "w-10 text-center text-lg font-medium text-sage-dark",
-                                    children: a
-                                }), h.jsx(It, {
-                                    type: "button",
-                                    variant: "outline",
-                                    size: "icon",
-                                    className: "h-10 w-10 border-[#c5a46d]/30 text-sage-dark hover:bg-[#c5a46d]/10",
-                                    onClick: () => l(Math.min(10, a + 1)),
-                                    disabled: a >= 10,
-                                    children: "+"
-                                })]
-                            })]
                         })]
                     }), h.jsxs("div", {
                         children: [h.jsx(ht, {
