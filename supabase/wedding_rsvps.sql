@@ -2,7 +2,8 @@
 -- (Supabase project jcuqwcwkowtjxcykstlf).
 -- Guests can only add responses. Reading them goes through
 -- get_ayman_shahd_rsvps(), which checks a bcrypt-hashed passcode and
--- stops answering a visitor for 15 minutes after 10 wrong attempts from them.
+-- stops answering a visitor for 15 minutes after 10 wrong attempts from them
+-- (or everyone after 100 wrong attempts in total).
 --
 -- Replace <PASSCODE> before running. Never commit the real passcode:
 -- this repository is public.
@@ -39,8 +40,9 @@ revoke all on table public.ayman_shahd_settings from anon, authenticated;
 
 create table public.ayman_shahd_key_attempts (
   at timestamptz not null default now(),
-  client text not null default ''
+  client text not null default '' check (char_length(client) <= 32)
 );
+create index ayman_shahd_key_attempts_client_at on public.ayman_shahd_key_attempts (client, at);
 alter table public.ayman_shahd_key_attempts enable row level security;
 revoke all on table public.ayman_shahd_key_attempts from anon, authenticated;
 
@@ -56,19 +58,26 @@ set search_path = public, extensions
 as $$
 declare
   h text;
-  who text := coalesce(
-    split_part(current_setting('request.headers', true)::json ->> 'x-forwarded-for', ',', 1),
+  hdr json := coalesce(current_setting('request.headers', true), '{}')::json;
+  -- cf-connecting-ip / x-real-ip are set by Supabase's proxy; the right-most
+  -- x-forwarded-for entry is the one the proxy appended. None can be faked by the visitor.
+  who text := md5(coalesce(
+    hdr ->> 'cf-connecting-ip',
+    hdr ->> 'x-real-ip',
+    trim(regexp_replace(hdr ->> 'x-forwarded-for', '^.*,', '')),
     ''
-  );
+  ));
 begin
-  -- One check at a time, so parallel guesses can't slip past the limit.
-  perform pg_advisory_xact_lock(hashtext('get_ayman_shahd_rsvps'));
+  -- One check at a time per visitor, so parallel guesses can't slip past the limit.
+  perform pg_advisory_xact_lock(hashtext('get_ayman_shahd_rsvps:' || who));
 
   delete from public.ayman_shahd_key_attempts where at < now() - interval '1 day';
 
-  -- Wrong guesses are limited per visitor, so a stranger can't lock the couple out.
+  -- 10 wrong guesses per visitor, and 100 from everyone combined, per 15 minutes.
   if (select count(*) from public.ayman_shahd_key_attempts
-      where client = who and at > now() - interval '15 minutes') >= 10 then
+      where client = who and at > now() - interval '15 minutes') >= 10
+     or (select count(*) from public.ayman_shahd_key_attempts
+      where at > now() - interval '15 minutes') >= 100 then
     return jsonb_build_object('ok', false, 'error', 'locked');
   end if;
 
