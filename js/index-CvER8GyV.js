@@ -31275,8 +31275,8 @@ function y3() {
     return t ? parseInt(t[1], 10) <= 18 : !1
 }
 y3() && console.warn("⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217");
-const v3 = "https://etxixznvxwjjkivempzk.supabase.co",
-    w3 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0eGl4em52eHdqamtpdmVtcHprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTY4NTYsImV4cCI6MjA4NzI5Mjg1Nn0.DAZmYr0Q-JQ_DpOqyNQalAzEm-yEauvX0aRRo3oDV4M",
+const v3 = "https://jcuqwcwkowtjxcykstlf.supabase.co",
+    w3 = "sb_publishable_BFtrH3u_sv9zat6B9SALyw_nS7Pajaa",
     rd = g3(v3, w3, {
         auth: {
             storage: localStorage,
@@ -31288,14 +31288,20 @@ const v3 = "https://etxixznvxwjjkivempzk.supabase.co",
 function x3() {
     return iE({
         mutationFn: async e => {
+            if (e.website) return {
+                isUpdate: !1
+            };
             const {
-                data: t,
                 error: n
-            } = await rd.functions.invoke("submit-rsvp", {
-                body: e
+            } = await rd.from("ayman_shahd_rsvps").insert({
+                attendance: e.attendance,
+                full_name: e.full_name,
+                guest_count: e.guest_count,
+                guests: e.guests,
+                dietary_requirements: e.dietary_requirements || null,
+                message: e.message || null
             });
             if (n) throw n;
-            if (t != null && t.error) throw new Error(t.error);
             return {
                 isUpdate: !1
             }
@@ -31580,11 +31586,12 @@ function E3() {
         try {
             await p.mutateAsync({
                 full_name: _.join(", ") || ((A = c[0]) == null ? void 0 : A.name) || "Guest",
-                email: ((N = c[0]) == null ? void 0 : N.email) || void 0,
                 attendance: d.attendance,
-                guest_count: r,
-                adult_count: r,
-                children_count: i === "yes" ? a : 0,
+                guest_count: d.attendance === "no" ? 1 : r,
+                guests: (d.attendance === "no" ? c.slice(0, 1) : c).map(D => ({
+                    name: D.name.trim(),
+                    dietary_requirements: d.attendance === "no" ? "" : D.dietaryRequirements.trim()
+                })).filter(D => D.name),
                 dietary_requirements: T || void 0,
                 message: C,
                 website: d.website

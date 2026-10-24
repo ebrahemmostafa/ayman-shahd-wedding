@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>RSVP Responses · Ayman &amp; Shahd</title>
+    <link rel="stylesheet" href="css/typekit-xoc5iak.css">
+    <link href="css/google-fonts-great-vibes.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style>
+        :root {
+            --ivory: #f9f7f2;
+            --paper: #ffffff;
+            --gold: #c5a46d;
+            --gold-soft: #a88a57;
+            --brown: #835f30;
+            --ink: #4a3a22;
+            --muted: #8a7a62;
+            --line: rgba(197, 164, 109, 0.28);
+            --yes: #5f7a4a;
+            --no: #a0563f;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--ivory);
+            color: var(--ink);
+            font-family: "arek-armenian", Georgia, serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .wrap { max-width: 980px; margin: 0 auto; padding: 40px 16px 64px; }
+        header { text-align: center; margin-bottom: 28px; }
+        .script { font-family: "Great Vibes", cursive; color: var(--brown); font-weight: 400; }
+        header h1 { font-size: clamp(44px, 9vw, 72px); margin: 0; line-height: 1.05; }
+        header p { margin: 6px 0 0; letter-spacing: .3em; text-transform: uppercase; font-size: 12px; color: var(--gold-soft); }
+
+        .card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 6px 24px rgba(131, 95, 48, .06); }
+
+        #gate { max-width: 380px; margin: 40px auto 0; padding: 32px 24px; text-align: center; }
+        #gate h2 { font-size: 40px; margin: 0 0 6px; }
+        #gate p { color: var(--muted); margin: 0 0 20px; font-size: 15px; }
+        #code {
+            width: 100%; font: inherit; font-size: 26px; letter-spacing: .5em; text-align: center;
+            padding: 12px 8px 12px calc(8px + .5em); border: 1px solid var(--line); border-radius: 10px;
+            background: var(--ivory); color: var(--ink); outline: none;
+        }
+        #code:focus { border-color: var(--gold); }
+        .btn {
+            font: inherit; font-size: 14px; letter-spacing: .12em; text-transform: uppercase;
+            border: 0; border-radius: 10px; padding: 12px 18px; cursor: pointer;
+            background: var(--gold); color: #fff; transition: background .2s;
+        }
+        .btn:hover { background: var(--gold-soft); }
+        .btn:disabled { opacity: .6; cursor: default; }
+        .btn.ghost { background: transparent; color: var(--brown); border: 1px solid var(--line); }
+        .btn.ghost:hover { background: rgba(197, 164, 109, .1); }
+        #gate .btn { width: 100%; margin-top: 14px; }
+        .error { color: var(--no); font-size: 14px; min-height: 20px; margin-top: 10px; }
+
+        #board[hidden], #gate[hidden] { display: none; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+        .stat { padding: 16px; text-align: center; }
+        .stat b { display: block; font-size: 32px; font-weight: 400; color: var(--brown); }
+        .stat span { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+
+        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+        .toolbar input {
+            flex: 1 1 200px; min-width: 0; font: inherit; font-size: 15px; padding: 11px 14px;
+            border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); outline: none;
+        }
+        .toolbar input:focus { border-color: var(--gold); }
+        .filters { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+        .filters button {
+            font: inherit; font-size: 13px; padding: 10px 14px; border: 0; background: var(--paper);
+            color: var(--muted); cursor: pointer;
+        }
+        .filters button.on { background: var(--gold); color: #fff; }
+
+        .list { display: grid; gap: 12px; }
+        .resp { padding: 18px 20px; }
+        .resp-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+        .resp h3 { margin: 0; font-size: 19px; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+        .pill { flex-shrink: 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; }
+        .pill.yes { background: rgba(95, 122, 74, .12); color: var(--yes); }
+        .pill.no { background: rgba(160, 86, 63, .12); color: var(--no); }
+        .meta { color: var(--muted); font-size: 13px; margin-top: 4px; }
+        .guests { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+        .guests li { font-size: 15px; overflow-wrap: anywhere; }
+        .guests li small { color: var(--muted); }
+        .msg {
+            margin: 12px 0 0; padding: 10px 14px; background: var(--ivory); border-radius: 10px;
+            font-style: italic; white-space: pre-wrap; overflow-wrap: anywhere;
+        }
+        .empty { text-align: center; color: var(--muted); padding: 40px 16px; }
+
+        @media (max-width: 640px) {
+            .wrap { padding-top: 28px; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .toolbar .btn { flex: 1 1 auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <h1 class="script">Ayman &amp; Shahd</h1>
+        <p>RSVP Responses</p>
+    </header>
+
+    <form id="gate" class="card" autocomplete="off">
+        <h2 class="script">Welcome</h2>
+        <p>Enter the passcode to see the responses.</p>
+        <input id="code" type="password" inputmode="numeric" maxlength="12" aria-label="Passcode" autofocus>
+        <button class="btn" type="submit">Open</button>
+        <div class="error" id="gate-error" role="alert"></div>
+    </form>
+
+    <main id="board" hidden>
+        <section class="stats">
+            <div class="card stat"><b id="s-total">0</b><span>Responses</span></div>
+            <div class="card stat"><b id="s-yes">0</b><span>Attending</span></div>
+            <div class="card stat"><b id="s-guests">0</b><span>Total guests</span></div>
+            <div class="card stat"><b id="s-no">0</b><span>Declined</span></div>
+        </section>
+
+        <div class="toolbar">
+            <input id="search" type="search" placeholder="Search names or messages">
+            <div class="filters" role="group" aria-label="Filter">
+                <button type="button" data-f="all" class="on">All</button>
+                <button type="button" data-f="yes">Attending</button>
+                <button type="button" data-f="no">Declined</button>
+            </div>
+            <button class="btn ghost" id="refresh" type="button">Refresh</button>
+            <button class="btn ghost" id="csv" type="button">Export CSV</button>
+            <button class="btn ghost" id="lock" type="button">Lock</button>
+        </div>
+
+        <div class="error" id="board-error" role="alert"></div>
+        <div class="list" id="list"></div>
+    </main>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://jcuqwcwkowtjxcykstlf.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_BFtrH3u_sv9zat6B9SALyw_nS7Pajaa";
+    const KEY_STORE = "ayman-shahd-responses-key";
+
+    const $ = id => document.getElementById(id);
+    let rows = [];
+    let filter = "all";
+
+    function readKey() { try { return sessionStorage.getItem(KEY_STORE) || ""; } catch (e) { return ""; } }
+    function saveKey(k) { try { k ? sessionStorage.setItem(KEY_STORE, k) : sessionStorage.removeItem(KEY_STORE); } catch (e) {} }
+
+    async function fetchResponses(key) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_ayman_shahd_rsvps`, {
+            method: "POST",
+            headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+            body: JSON.stringify({ p_key: key })
+        });
+        const body = await res.json().catch(() => null);
+        if (!res.ok) {
+            const err = new Error(body && body.message || "Could not load responses");
+            err.badKey = body && body.code === "28000";
+            throw err;
+        }
+        return body || [];
+    }
+
+    function guestsOf(r) {
+        const list = Array.isArray(r.guests) ? r.guests.filter(g => g && g.name) : [];
+        return list.length ? list : [{ name: r.full_name, dietary_requirements: "" }];
+    }
+
+    function fmtDate(iso) {
+        return new Date(iso).toLocaleString("en-GB", {
+            day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Africa/Cairo"
+        });
+    }
+
+    function el(tag, attrs, ...children) {
+        const node = document.createElement(tag);
+        for (const [k, v] of Object.entries(attrs || {})) node.setAttribute(k, v);
+        for (const c of children) if (c != null) node.append(c);
+        return node;
+    }
+
+    function render() {
+        const yes = rows.filter(r => r.attendance === "yes");
+        $("s-total").textContent = rows.length;
+        $("s-yes").textContent = yes.length;
+        $("s-no").textContent = rows.length - yes.length;
+        $("s-guests").textContent = yes.reduce((n, r) => n + (r.guest_count || 1), 0);
+
+        const q = $("search").value.trim().toLowerCase();
+        const shown = rows.filter(r =>
+            (filter === "all" || r.attendance === filter) &&
+            (!q || [r.full_name, r.message, ...guestsOf(r).map(g => g.name)].join(" ").toLowerCase().includes(q))
+        );
+
+        const list = $("list");
+        list.replaceChildren();
+        if (!shown.length) {
+            list.append(el("div", { class: "card empty" }, rows.length ? "No responses match." : "No responses yet."));
+            return;
+        }
+        for (const r of shown) {
+            const attending = r.attendance === "yes";
+            const guests = guestsOf(r);
+            const card = el("article", { class: "card resp" },
+                el("div", { class: "resp-top" },
+                    el("div", {},
+                        el("h3", { dir: "auto" }, guests[0].name),
+                        el("div", { class: "meta" },
+                            `${fmtDate(r.created_at)}${attending ? ` · ${r.guest_count || 1} guest${(r.guest_count || 1) > 1 ? "s" : ""}` : ""}`)
+                    ),
+                    el("span", { class: `pill ${attending ? "yes" : "no"}` }, attending ? "Attending" : "Declined")
+                )
+            );
+            if (attending) {
+                const ul = el("ul", { class: "guests" });
+                guests.forEach((g, i) => ul.append(el("li", { dir: "auto" },
+                    `${i + 1}. ${g.name}`,
+                    g.dietary_requirements ? el("small", {}, ` · ${g.dietary_requirements}`) : null
+                )));
+                card.append(ul);
+            }
+            if (r.message) card.append(el("p", { class: "msg", dir: "auto" }, r.message));
+            list.append(card);
+        }
+    }
+
+    async function load(key) {
+        const data = await fetchResponses(key);
+        rows = data;
+        render();
+    }
+
+    $("gate").addEventListener("submit", async e => {
+        e.preventDefault();
+        const key = $("code").value.trim();
+        const btn = e.submitter || $("gate").querySelector("button");
+        $("gate-error").textContent = "";
+        btn.disabled = true;
+        try {
+            await load(key);
+            saveKey(key);
+            $("gate").hidden = true;
+            $("board").hidden = false;
+        } catch (err) {
+            $("gate-error").textContent = err.badKey ? "Wrong passcode." : err.message;
+        } finally {
+            btn.disabled = false;
+        }
+    });
+
+    $("search").addEventListener("input", render);
+    document.querySelectorAll(".filters button").forEach(b => b.addEventListener("click", () => {
+        filter = b.dataset.f;
+        document.querySelectorAll(".filters button").forEach(x => x.classList.toggle("on", x === b));
+        render();
+    }));
+
+    $("refresh").addEventListener("click", async () => {
+        $("board-error").textContent = "";
+        $("refresh").disabled = true;
+        try { await load(readKey()); }
+        catch (err) { $("board-error").textContent = err.message; }
+        finally { $("refresh").disabled = false; }
+    });
+
+    $("lock").addEventListener("click", () => {
+        saveKey("");
+        rows = [];
+        $("code").value = "";
+        $("board").hidden = true;
+        $("gate").hidden = false;
+        $("code").focus();
+    });
+
+    $("csv").addEventListener("click", () => {
+        const esc = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+        const lines = [["Submitted", "Attendance", "Guest count", "Guests", "Dietary requirements", "Message"].map(esc).join(",")];
+        for (const r of rows) {
+            const guests = guestsOf(r);
+            lines.push([
+                fmtDate(r.created_at),
+                r.attendance === "yes" ? "Attending" : "Declined",
+                r.attendance === "yes" ? (r.guest_count || 1) : 0,
+                guests.map(g => g.name).join(" | "),
+                guests.filter(g => g.dietary_requirements).map(g => `${g.name}: ${g.dietary_requirements}`).join(" | "),
+                r.message
+            ].map(esc).join(","));
+        }
+        const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+        const a = el("a", { href: URL.createObjectURL(blob), download: "ayman-shahd-rsvps.csv" });
+        document.body.append(a);
+        a.click();
+        a.remove();
+    });
+
+    const saved = readKey();
+    if (saved) {
+        $("code").value = saved;
+        $("gate").requestSubmit();
+    }
+</script>
+</body>
+</html>
