@@ -22003,7 +22003,7 @@ const FF = {
         ...VF
     },
     te = zL(UF, n$),
-    BF = "./assets/images/hero-photo.jpg";
+    BF = "./assets/images/hero-photo-original.jpg";
 
 function zF({
     name1: e,
@@ -22026,7 +22026,7 @@ function zF({
                 alt: "Ayman & Shahd",
                 className: "absolute inset-0 w-full h-full object-cover",
                 style: {
-                    objectPosition: "center 40%"
+                    objectPosition: "5% 40%"
                 }
             }), h.jsx("div", {
                 className: "absolute inset-0 bg-black/30"
