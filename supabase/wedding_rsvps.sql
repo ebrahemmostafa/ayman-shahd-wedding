@@ -2,7 +2,7 @@
 -- (Supabase project jcuqwcwkowtjxcykstlf).
 -- Guests can only add responses. Reading them goes through
 -- get_ayman_shahd_rsvps(), which checks a bcrypt-hashed passcode and
--- stops answering for 15 minutes after 10 wrong attempts.
+-- stops answering a visitor for 15 minutes after 10 wrong attempts from them.
 --
 -- Replace <PASSCODE> before running. Never commit the real passcode:
 -- this repository is public.
@@ -38,7 +38,8 @@ alter table public.ayman_shahd_settings enable row level security;
 revoke all on table public.ayman_shahd_settings from anon, authenticated;
 
 create table public.ayman_shahd_key_attempts (
-  at timestamptz not null default now()
+  at timestamptz not null default now(),
+  client text not null default ''
 );
 alter table public.ayman_shahd_key_attempts enable row level security;
 revoke all on table public.ayman_shahd_key_attempts from anon, authenticated;
@@ -55,17 +56,25 @@ set search_path = public, extensions
 as $$
 declare
   h text;
+  who text := coalesce(
+    split_part(current_setting('request.headers', true)::json ->> 'x-forwarded-for', ',', 1),
+    ''
+  );
 begin
+  -- One check at a time, so parallel guesses can't slip past the limit.
+  perform pg_advisory_xact_lock(hashtext('get_ayman_shahd_rsvps'));
+
   delete from public.ayman_shahd_key_attempts where at < now() - interval '1 day';
 
+  -- Wrong guesses are limited per visitor, so a stranger can't lock the couple out.
   if (select count(*) from public.ayman_shahd_key_attempts
-      where at > now() - interval '15 minutes') >= 10 then
+      where client = who and at > now() - interval '15 minutes') >= 10 then
     return jsonb_build_object('ok', false, 'error', 'locked');
   end if;
 
   select key_hash into h from public.ayman_shahd_settings where id = 1;
   if h is null or p_key is null or extensions.crypt(p_key, h) <> h then
-    insert into public.ayman_shahd_key_attempts default values;
+    insert into public.ayman_shahd_key_attempts (client) values (who);
     return jsonb_build_object('ok', false, 'error', 'invalid');
   end if;
 
