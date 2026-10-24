@@ -160,12 +160,15 @@
             body: JSON.stringify({ p_key: key })
         });
         const body = await res.json().catch(() => null);
-        if (!res.ok) {
-            const err = new Error(body && body.message || "Could not load responses");
-            err.badKey = body && body.code === "28000";
+        if (!res.ok || !body) throw new Error(body && body.message || "Could not load responses");
+        if (!body.ok) {
+            const err = new Error(body.error === "locked"
+                ? "Too many wrong attempts. Try again in 15 minutes."
+                : "Wrong passcode.");
+            err.badKey = true;
             throw err;
         }
-        return body || [];
+        return body.rows || [];
     }
 
     function guestsOf(r) {
@@ -249,7 +252,7 @@
             $("gate").hidden = true;
             $("board").hidden = false;
         } catch (err) {
-            $("gate-error").textContent = err.badKey ? "Wrong passcode." : err.message;
+            $("gate-error").textContent = err.message;
         } finally {
             btn.disabled = false;
         }
@@ -280,7 +283,12 @@
     });
 
     $("csv").addEventListener("click", () => {
-        const esc = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+        // Prefix formula-like values so spreadsheets show them as text.
+        const esc = v => {
+            let s = String(v ?? "");
+            if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+            return `"${s.replace(/"/g, '""')}"`;
+        };
         const lines = [["Submitted", "Attendance", "Guest count", "Guests", "Dietary requirements", "Message"].map(esc).join(",")];
         for (const r of rows) {
             const guests = guestsOf(r);
