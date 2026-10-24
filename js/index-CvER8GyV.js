@@ -22003,7 +22003,7 @@ const FF = {
         ...VF
     },
     te = zL(UF, n$),
-    BF = "./assets/videos/hero-video-BkP1eoiB.mp4";
+    BF = "./assets/images/hero-photo.jpg";
 
 function zF({
     name1: e,
@@ -22021,13 +22021,13 @@ function zF({
         className: "relative min-h-screen flex flex-col overflow-hidden bg-white",
         children: [h.jsxs("div", {
             className: "absolute inset-0 overflow-hidden",
-            children: [h.jsx("video", {
-                autoPlay: !0,
-                muted: !0,
-                loop: !0,
-                playsInline: !0,
+            children: [h.jsx("img", {
+                src: BF,
+                alt: "Ayman & Shahd",
                 className: "absolute inset-0 w-full h-full object-cover",
-                src: BF
+                style: {
+                    objectPosition: "center 40%"
+                }
             }), h.jsx("div", {
                 className: "absolute inset-0 bg-black/30"
             })]
